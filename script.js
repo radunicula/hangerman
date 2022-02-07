@@ -7,6 +7,13 @@ window.onload = function () {
         "while", "algorithm", 'function', "object oriented"
     ];
     let word;
+    let guess;
+    let geusses = [];
+    let lives;
+    let counter;
+    let space;
+    let win = 0;
+    const showLives = document.getElementById("mylives");
 
     const buttons = function () {
         let myButtons = document.getElementById('buttons');
@@ -24,6 +31,48 @@ window.onload = function () {
         }
     };
 
+    let check = function () {
+        let image = document.getElementById('image');
+        list.onclick = function () {
+            const geuss = (this.innerHTML);
+            this.setAttribute("class", "btn btn-dark");
+            this.disabled = true;
+            this.onclick = null;
+            for (let i = 0; i < word.length; i++) {
+                if (word[i] === geuss) {
+                    geusses[i].innerHTML = geuss;
+                    ++counter;
+                }
+            }
+            const j = (word.indexOf(geuss));
+            if (j === -1) {
+                --lives;
+                image.setAttribute("src","images/"+ lives +".jpg")
+                comments();
+            } else {
+                comments();
+            }
+        }
+    }
+
+    let result = function () {
+        let wordHolder = document.getElementById('hold');
+        let correct = document.createElement('ul');
+        for (let i = 0; i < word.length; i++) {
+            correct.setAttribute('id', 'my-word');
+            guess = document.createElement('li');
+            guess.setAttribute('class', 'btn');
+            if (word[i] === "-") {
+                guess.innerHTML = "-";
+                space = 1;
+            } else {
+                guess.innerHTML = "_";
+            }
+            geusses.push(guess);
+            wordHolder.appendChild(correct);
+            correct.appendChild(guess);
+        }
+    }
 
     let comments = function () {
         showLives.innerHTML = "You have " + lives + " lives";
@@ -40,7 +89,6 @@ window.onload = function () {
         }
     }
 
-
     let stop = function () {
         let letters = document.getElementsByClassName("btn btn-dark");
         if(win === 1 || lives === 0) {
@@ -50,12 +98,15 @@ window.onload = function () {
         }
     }
 
-
     let play = function () {
         word = words[Math.floor(Math.random() * words.length)];
         word = word.replace(/\s/g, "-");
         console.log(word);
         buttons();
+        geusses = [];
+        lives = 6;
+        counter = 0;
+        space = 0;
         result();
         comments();
 
