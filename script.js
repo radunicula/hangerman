@@ -1,4 +1,5 @@
 window.onload = function () {
+    const show_lives = document.getElementById("mylives");
     const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
         't', 'u', 'v', 'w', 'x', 'y', 'z'];
@@ -6,17 +7,11 @@ window.onload = function () {
         "python", "java", "django", "script", "javascript", "include", "mysql", "database", "double",
         "while", "algorithm", 'function', "object oriented"
     ];
-    let word;
-    let guess;
-    let geusses = [];
-    let lives;
-    let counter;
-    let space;
-    let win = 0;
-    const showLives = document.getElementById("mylives");
+    let word, lives, guessed_letters_counter, space_between_words, win = 0;
+    let guesses = [];
 
-    const buttons = function () {
-        let myButtons = document.getElementById('buttons');
+    function letter_buttons_construct() {
+        let buttons = document.getElementById('buttons');
         let letters = document.createElement('ul');
         for (let i = 0; i < alphabet.length; i++) {
             letters.id = 'alphabet';
@@ -25,91 +20,86 @@ window.onload = function () {
             list.setAttribute("class", "btn btn-dark")
             list.setAttribute("style", "height:40px;width:35px")
             list.innerHTML = alphabet[i];
-            check();
-            myButtons.appendChild(letters);
+            buttons.appendChild(letters);
             letters.appendChild(list);
-        }
-    };
-
-    let check = function () {
-        let image = document.getElementById('image');
-        list.onclick = function () {
-            const geuss = (this.innerHTML);
-            this.setAttribute("class", "btn btn-dark");
-            this.disabled = true;
-            this.onclick = null;
-            for (let i = 0; i < word.length; i++) {
-                if (word[i] === geuss) {
-                    geusses[i].innerHTML = geuss;
-                    ++counter;
-                }
-            }
-            const j = (word.indexOf(geuss));
-            if (j === -1) {
-                --lives;
-                image.setAttribute("src","images/"+ lives +".jpg")
-                comments();
-            } else {
-                comments();
-            }
+            check_letter();
         }
     }
 
-    let result = function () {
-        let wordHolder = document.getElementById('hold');
+    function check_letter() {
+        let image = document.getElementById('image');
+        list.onclick = function () {
+            const guess = (this.innerHTML);
+            this.setAttribute("class", "btn btn-dark");
+            this.disabled = true;
+            this.onclick = null;
+            for (let i = 0; i < word.length; ++i) {
+                if (word[i] === guess) {
+                    guesses[i].innerHTML = guess;
+                    ++guessed_letters_counter;
+                }
+            }
+            const j = (word.indexOf(guess));
+            if (j === -1) {
+                --lives;
+                image.setAttribute("src", "/images" + lives + ".jpg")
+                game_comments();
+            } else { game_comments(); }
+        }
+    }
+
+    function result() {
+        let word_holder = document.getElementById('hold');
         let correct = document.createElement('ul');
-        for (let i = 0; i < word.length; i++) {
+        for (let i = 0; i < word.length; ++i) {
             correct.setAttribute('id', 'my-word');
-            guess = document.createElement('li');
+            const guess = document.createElement('li');
             guess.setAttribute('class', 'btn');
             if (word[i] === "-") {
                 guess.innerHTML = "-";
-                space = 1;
-            } else {
-                guess.innerHTML = "_";
-            }
-            geusses.push(guess);
-            wordHolder.appendChild(correct);
+                space_between_words = 1;
+            } else { guess.innerHTML = "_"; }
+            guesses.push(guess);
+            word_holder.appendChild(correct);
             correct.appendChild(guess);
         }
     }
 
-    let comments = function () {
-        showLives.innerHTML = "You have " + lives + " lives";
+    function game_comments() {
+        show_lives.innerHTML = "You have " + lives + " lives";
         if (lives < 1) {
-            showLives.innerHTML = "Game Over";
-            stop();
+            show_lives.innerHTML = "Game Over";
+            game_over();
         }
-        for (let i = 0; i < geusses.length; ++i) {
-            if (counter + space === geusses.length) {
-                showLives.innerHTML = "You Win!";
+        for (let i = 0; i < guesses.length; ++i) {
+            if (guessed_letters_counter + space_between_words === guesses.length) {
+                show_lives.innerHTML = "You Win!";
                 win = 1;
-                stop();
+                game_over();
             }
         }
     }
 
-    let stop = function () {
+    function game_over() {
         let letters = document.getElementsByClassName("btn btn-dark");
-        if(win === 1 || lives === 0) {
-            for(let i = 0; i<letters.length;++i){
+        if (win === 1 || lives === 0) {
+            for (let i = 0; i < letters.length; ++i) {
                 letters[i].disabled = true;
             }
         }
     }
 
-    let play = function () {
-        word = words[Math.floor(Math.random() * words.length)];
-        word = word.replace(/\s/g, "-");
-        console.log(word);
-        buttons();
-        geusses = [];
+    function play() {
+        word = words[Math.floor(Math.random() * words.length)];     // get a random word from words list
+        word = word.replace(/\s/g, "-");                            // if the word is compound will change the space between words with "-"
+        console.log(word);                                         
+        letter_buttons_construct();
+        guesses = [];
         lives = 6;
-        counter = 0;
-        space = 0;
+        guessed_letters_counter = 0;
+        space_between_words = 0;
         result();
-        comments();
-
+        game_comments();
     }
     play();
 }
